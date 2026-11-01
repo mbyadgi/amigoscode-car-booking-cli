@@ -43,7 +43,7 @@ public class Main {
                 option = scanner.nextInt();
                 switch (option) {
                     case 1 -> bookCar(carBookingService, scanner);
-                    case 2 -> deleteBooKing(carBookingService, scanner);
+                    case 2 -> deleteBooking(carBookingService, scanner);
                     case 3 -> displayCarsBookedByUser(carBookingService, userService, scanner);
                     case 4 -> displayCarBookings(carBookingService);
                     case 5 -> displayAvailableCars(carService, carBookingService, false);
@@ -95,7 +95,7 @@ public class Main {
         System.out.println(carBooking);
     }
 
-    private static void deleteBooKing(CarBookingService carBookingService, Scanner scanner) {
+    private static void deleteBooking(CarBookingService carBookingService, Scanner scanner) {
         if (carBookingService.noActiveCarBookingsExist()) {
             System.out.println("No Active Car Bookings found");
             return;
