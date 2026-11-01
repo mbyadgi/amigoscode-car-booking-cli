@@ -35,7 +35,7 @@ public class CarBookingService {
         if (car == null) throw new CarBookingException("No Car found with ID: " + carId);
 
         if (startDate.isBefore(LocalDate.now())) throw new CarBookingException("start date cannot be in past");
-        if (startDate.equals(endDate) || startDate.isAfter(endDate)) throw new CarBookingException("end date must be after start date");
+        if (!endDate.isAfter(startDate)) throw new CarBookingException("end date must be after start date");
 
         if (isCarBooked(car))
             throw new CarBookingException("The Car is not available. Delete the booking with this car to make it available.");
