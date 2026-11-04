@@ -17,10 +17,10 @@ public class CarBookingService {
     private final UserService userService;
     private final CarService carService;
 
-    public CarBookingService() {
-        this.carBookingDao = new CarBookingDao();
-        this.userService = new UserService();
-        this.carService = new CarService();
+    public CarBookingService(CarBookingDao carBookingDao, UserService userService, CarService carService) {
+        this.carBookingDao = carBookingDao;
+        this.userService = userService;
+        this.carService = carService;
     }
 
     public CarBooking[] getCarBookings() {
@@ -28,10 +28,10 @@ public class CarBookingService {
     }
 
     public CarBooking bookCar(UUID userId, UUID carId, LocalDate startDate, LocalDate endDate) {
-        User user = userService.getUserById(userId);
+        User user = userService.findUserById(userId);
         if (user == null) throw new CarBookingException("No User found with ID: " + userId);
 
-        Car car = carService.getCarById(carId);
+        Car car = carService.findCarById(carId);
         if (car == null) throw new CarBookingException("No Car found with ID: " + carId);
 
         if (startDate.isBefore(LocalDate.now())) throw new CarBookingException("start date cannot be in past");
@@ -42,14 +42,14 @@ public class CarBookingService {
 
         long bookingDays = ChronoUnit.DAYS.between(startDate, endDate);
         BigDecimal price = car.getRentalPricePerDay().multiply(BigDecimal.valueOf(bookingDays));
-        return carBookingDao.saveCarBooking(user, car, startDate, endDate, price, BookingStatus.ACTIVE, LocalDateTime.now());
+        return carBookingDao.saveCarBooking(new CarBooking(UUID.randomUUID(), user, car, startDate, endDate, price, BookingStatus.ACTIVE, LocalDateTime.now()));
     }
 
     public CarBooking cancelCarBooking(UUID carBookingId) {
-        CarBooking carBooking = carBookingDao.getCarBookingById(carBookingId);
+        CarBooking carBooking = carBookingDao.findCarBookingById(carBookingId);
         if (carBooking == null) throw new CarBookingException("No booking found for ID: " + carBookingId);
         if (carBooking.getBookingStatus().equals(BookingStatus.CANCELLED)) throw new CarBookingException("Booking is already Cancelled");
-        return carBookingDao.cancelCarBooking(carBooking);
+        return carBookingDao.cancelCarBooking(carBookingId);
     }
 
     public boolean isCarBooked(Car car) {

@@ -1,13 +1,9 @@
 package com.mohi;
 
-import com.mohi.booking.BookingStatus;
-import com.mohi.booking.CarBooking;
-import com.mohi.booking.CarBookingService;
-import com.mohi.car.Car;
-import com.mohi.car.CarService;
+import com.mohi.booking.*;
+import com.mohi.car.*;
 import com.mohi.exception.CarBookingException;
-import com.mohi.user.User;
-import com.mohi.user.UserService;
+import com.mohi.user.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,10 +13,20 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class Main {
+
+    public static final String USERS_FILE_PATH = "src/com/mohi/resources/users.dat";
+    public static final String CARS_FILE_PATH = "src/com/mohi/resources/cars.dat";
+    public static final String CAR_BOOKINGS_FILE_PATH = "src/com/mohi/resources/carBookings.dat";
+
     static void main() {
-        UserService userService = new UserService();
-        CarService carService = new CarService();
-        CarBookingService carBookingService = new CarBookingService();
+        UserDao userDao = new UserFileDataAccessService(USERS_FILE_PATH);
+        UserService userService = new UserService(userDao);
+
+        CarDao carDao = new CarFileDataAccessService(CARS_FILE_PATH);
+        CarService carService = new CarService(carDao);
+
+        CarBookingDao carBookingDao = new CarBookingFileDataAccessService(CAR_BOOKINGS_FILE_PATH);
+        CarBookingService carBookingService = new CarBookingService(carBookingDao, userService, carService);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -108,15 +114,15 @@ public class Main {
     }
 
     private static void displayCarsBookedByUser(CarBookingService carBookingService, UserService userService, Scanner scanner) {
-        if (carBookingService.noCarBookingsExist()) {
-            System.out.println("No Car Bookings found");
+        if (carBookingService.noActiveCarBookingsExist()) {
+            System.out.println("No Active Car Bookings found");
             return;
         }
 
         System.out.println("Please provide User ID:");
         UUID userId = UUID.fromString(scanner.next());
 
-        User user = userService.getUserById(userId);
+        User user = userService.findUserById(userId);
         if (user == null) throw new CarBookingException("No User found with ID: " + userId);
 
         boolean noCarsBooked = true;
