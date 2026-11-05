@@ -1,0 +1,52 @@
+package com.mohi.user;
+
+import com.mohi.exception.CarBookingException;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.UUID;
+
+public class UserFileDataAccessService implements UserDao {
+    private final String filePath;
+
+    public UserFileDataAccessService(String filePath) {
+        this.filePath = filePath;
+    }
+
+    @Override
+    public User[] getUsers() {
+        User[] users = new User[0];
+        int userCount = 0;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if(line.isBlank()) continue;
+
+                String[] values = line.split(",");
+
+                UUID userId = UUID.fromString(values[0].trim());
+                String name = values[1].trim();
+
+                users = Arrays.copyOf(users, userCount + 1);
+                users[userCount++] = new User(userId, name);
+            }
+        } catch (IOException e) {
+            throw new CarBookingException("error while reading file: " + e.getMessage());
+        }
+
+        return users;
+    }
+
+    @Override
+    public User findUserById(UUID userId) {
+        for (User user : getUsers()) {
+            if (userId.equals(user.getId())) {
+                return user;
+            }
+        }
+        return null;
+    }
+}
