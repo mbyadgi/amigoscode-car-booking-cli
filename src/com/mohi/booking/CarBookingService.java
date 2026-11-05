@@ -55,7 +55,7 @@ public class CarBookingService {
     public boolean isCarBooked(Car car) {
         if (noCarBookingsExist()) return false;
         for (CarBooking carBooking : carBookingDao.getCarBookings()) {
-            if (carBooking.getCar().equals(car) && carBooking.getBookingStatus().equals(BookingStatus.ACTIVE)) {
+            if (carBooking.getCar().getId().equals(car.getId()) && carBooking.getBookingStatus().equals(BookingStatus.ACTIVE)) {
                 return true;
             }
         }

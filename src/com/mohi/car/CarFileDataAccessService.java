@@ -24,6 +24,8 @@ public class CarFileDataAccessService implements CarDao{
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                if(line.isBlank()) continue;
+
                 String[] values = line.split(",");
 
                 UUID carId = UUID.fromString(values[0].trim());
