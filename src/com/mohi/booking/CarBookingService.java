@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 public class CarBookingService {
@@ -23,7 +24,7 @@ public class CarBookingService {
         this.carService = carService;
     }
 
-    public CarBooking[] getCarBookings() {
+    public List<CarBooking> getCarBookings() {
         return carBookingDao.getCarBookings();
     }
 
@@ -48,7 +49,8 @@ public class CarBookingService {
     public CarBooking cancelCarBooking(UUID carBookingId) {
         CarBooking carBooking = carBookingDao.findCarBookingById(carBookingId);
         if (carBooking == null) throw new CarBookingException("No booking found for ID: " + carBookingId);
-        if (carBooking.getBookingStatus().equals(BookingStatus.CANCELLED)) throw new CarBookingException("Booking is already Cancelled");
+        if (carBooking.getBookingStatus().equals(BookingStatus.CANCELLED))
+            throw new CarBookingException("Booking is already Cancelled");
         return carBookingDao.cancelCarBooking(carBookingId);
     }
 
@@ -64,15 +66,13 @@ public class CarBookingService {
 
     public boolean noActiveCarBookingsExist() {
         if (noCarBookingsExist()) return true;
-        for (CarBooking carBooking : carBookingDao.getCarBookings()){
-            if(carBooking.getBookingStatus().equals(BookingStatus.ACTIVE)){
-                return false;
-            }
+        for (CarBooking carBooking : carBookingDao.getCarBookings()) {
+            if (carBooking.getBookingStatus().equals(BookingStatus.ACTIVE)) return false;
         }
         return true;
     }
 
     public boolean noCarBookingsExist() {
-        return carBookingDao.getCarBookings() == null || carBookingDao.getCarBookings().length == 0;
+        return carBookingDao.getCarBookings().isEmpty();
     }
 }

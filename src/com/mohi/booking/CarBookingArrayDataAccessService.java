@@ -1,14 +1,14 @@
 package com.mohi.booking;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class CarBookingArrayDataAccessService implements CarBookingDao {
-    private static CarBooking[] carBookings;
-    private static int carBookingsCount = 0;
+    private static final List<CarBooking> carBookings = new ArrayList<>();
 
     @Override
-    public CarBooking[] getCarBookings() {
+    public List<CarBooking> getCarBookings() {
         return carBookings;
     }
 
@@ -24,14 +24,8 @@ public class CarBookingArrayDataAccessService implements CarBookingDao {
 
     @Override
     public CarBooking saveCarBooking(CarBooking carBooking) {
-        if (carBookings == null || carBookings.length == 0) {
-            carBookings = new CarBooking[1];
-        }
-        if (carBookingsCount == carBookings.length) {
-            carBookings = Arrays.copyOf(carBookings, carBookingsCount + 1);
-        }
-        carBookings[carBookingsCount] = carBooking;
-        return carBookings[carBookingsCount++];
+        carBookings.add(carBooking);
+        return carBookings.getLast();
     }
 
     @Override
