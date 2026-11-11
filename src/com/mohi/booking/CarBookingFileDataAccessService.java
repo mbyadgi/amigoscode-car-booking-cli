@@ -1,11 +1,13 @@
 package com.mohi.booking;
 
+import com.mohi.car.Car;
 import com.mohi.exception.CarBookingException;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +24,12 @@ public class CarBookingFileDataAccessService implements CarBookingDao {
 
         if (Files.exists(Path.of(filePath))) {
             try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filePath))) {
-                carBookings = (List<CarBooking>) inputStream.readObject();
+                Object readObject = inputStream.readObject();
+                if(readObject instanceof List<?>){
+                    carBookings = (List<CarBooking>) readObject;
+                } else if (readObject instanceof CarBooking[]) {
+                    carBookings = new ArrayList<>(Arrays.asList((CarBooking[]) readObject));
+                }
             } catch (IOException | ClassNotFoundException e) {
                 throw new CarBookingException("Failed to read car bookings from " + filePath + e.getMessage());
             }
