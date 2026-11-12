@@ -6,10 +6,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-public class CarFileDataAccessService implements CarDao{
+public class CarFileDataAccessService implements CarDao {
     private final String filePath;
 
     public CarFileDataAccessService(String filePath) {
@@ -17,14 +18,13 @@ public class CarFileDataAccessService implements CarDao{
     }
 
     @Override
-    public Car[] getCars() {
-        Car[] cars = new Car[0];
-        int carCount = 0;
+    public List<Car> getCars() {
+        List<Car> cars = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if(line.isBlank()) continue;
+                if (line.isBlank()) continue;
 
                 String[] values = line.split(",");
 
@@ -34,8 +34,7 @@ public class CarFileDataAccessService implements CarDao{
                 Brand brand = Brand.valueOf(values[3].trim());
                 boolean isElectric = Boolean.parseBoolean(values[4].trim());
 
-                cars = Arrays.copyOf(cars, carCount + 1);
-                cars[carCount++] = new Car(carId, regNumber, rentalPricePerDay, brand, isElectric);
+                cars.add(new Car(carId, regNumber, rentalPricePerDay, brand, isElectric));
             }
         } catch (IOException e) {
             throw new CarBookingException("error while reading file: " + e.getMessage());

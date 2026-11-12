@@ -1,9 +1,10 @@
 package com.mohi.car;
 
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public interface CarDao {
-    Car[] getCars();
+    List<Car> getCars();
+
     Car findCarById(UUID carId);
 }
