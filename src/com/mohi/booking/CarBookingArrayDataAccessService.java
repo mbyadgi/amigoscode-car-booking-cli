@@ -2,6 +2,7 @@ package com.mohi.booking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CarBookingArrayDataAccessService implements CarBookingDao {
@@ -13,13 +14,8 @@ public class CarBookingArrayDataAccessService implements CarBookingDao {
     }
 
     @Override
-    public CarBooking findCarBookingById(UUID carBookingId) {
-        for (CarBooking carBooking : carBookings) {
-            if (carBookingId.equals(carBooking.getId())) {
-                return carBooking;
-            }
-        }
-        return null;
+    public Optional<CarBooking> findCarBookingById(UUID carBookingId) {
+        return carBookings.stream().filter(carBooking -> carBookingId.equals(carBooking.getId())).findFirst();
     }
 
     @Override
@@ -30,7 +26,7 @@ public class CarBookingArrayDataAccessService implements CarBookingDao {
 
     @Override
     public CarBooking cancelCarBooking(UUID carBookingId) {
-        CarBooking carBooking = findCarBookingById(carBookingId);
+        CarBooking carBooking = findCarBookingById(carBookingId).get();
         carBooking.setBookingStatus(BookingStatus.CANCELLED);
         return carBooking;
     }

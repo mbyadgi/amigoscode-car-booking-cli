@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CarFileDataAccessService implements CarDao {
@@ -44,12 +45,7 @@ public class CarFileDataAccessService implements CarDao {
     }
 
     @Override
-    public Car findCarById(UUID carId) {
-        for (Car car : getCars()) {
-            if (carId.equals(car.getId())) {
-                return car;
-            }
-        }
-        return null;
+    public Optional<Car> findCarById(UUID carId) {
+        return getCars().stream().filter(car -> carId.equals(car.getId())).findFirst();
     }
 }

@@ -1,6 +1,7 @@
 package com.mohi.car;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CarService {
@@ -14,7 +15,7 @@ public class CarService {
         return carDao.getCars();
     }
 
-    public Car findCarById(UUID carId) {
+    public Optional<Car> findCarById(UUID carId) {
         return carDao.findCarById(carId);
     }
 }

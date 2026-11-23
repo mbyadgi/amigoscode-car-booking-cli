@@ -1,6 +1,7 @@
 package com.mohi.user;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserArrayDataAccessService implements UserDao {
@@ -21,12 +22,7 @@ public class UserArrayDataAccessService implements UserDao {
     }
 
     @Override
-    public User findUserById(UUID userId) {
-        for (User user : users) {
-            if (userId.equals(user.getId())) {
-                return user;
-            }
-        }
-        return null;
+    public Optional<User> findUserById(UUID userId) {
+        return users.stream().filter(user -> userId.equals(user.getId())).findFirst();
     }
 }

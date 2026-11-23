@@ -1,10 +1,11 @@
 package com.mohi.user;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserDao {
     List<User> getUsers();
 
-    User findUserById(UUID userId);
+    Optional<User> findUserById(UUID userId);
 }

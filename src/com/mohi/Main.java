@@ -1,6 +1,9 @@
 package com.mohi;
 
-import com.mohi.booking.*;
+import com.mohi.booking.CarBooking;
+import com.mohi.booking.CarBookingDao;
+import com.mohi.booking.CarBookingFileDataAccessService;
+import com.mohi.booking.CarBookingService;
 import com.mohi.car.Car;
 import com.mohi.car.CarDao;
 import com.mohi.car.CarFileDataAccessService;
@@ -15,6 +18,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -56,11 +60,11 @@ public class Main {
                 switch (option) {
                     case 1 -> bookCar(carBookingService, scanner);
                     case 2 -> deleteBooking(carBookingService, scanner);
-                    case 3 -> displayCarsBookedByUser(carBookingService, userService, scanner);
-                    case 4 -> displayCarBookings(carBookingService);
-                    case 5 -> displayAvailableCars(carService, carBookingService, false);
-                    case 6 -> displayAvailableCars(carService, carBookingService, true);
-                    case 7 -> displayUsers(userService);
+                    case 3 -> displayCarsBookedByUser(carBookingService, scanner);
+                    case 4 -> displayCarBookings(carBookingService.getCarBookings());
+                    case 5 -> displayAvailableCars(carBookingService.getAvailableCars());
+                    case 6 -> displayAvailableCars(carBookingService.getAvailableElectricCars());
+                    case 7 -> displayUsers(userService.getUsers());
                     case 8 -> System.out.println("Good Bye!");
                     default -> throw new CarBookingException("Invalid option provided!!");
                 }
@@ -119,7 +123,7 @@ public class Main {
         System.out.println(carBooking);
     }
 
-    private static void displayCarsBookedByUser(CarBookingService carBookingService, UserService userService, Scanner scanner) {
+    private static void displayCarsBookedByUser(CarBookingService carBookingService, Scanner scanner) {
         if (carBookingService.noActiveCarBookingsExist()) {
             System.out.println("No Active Car Bookings found");
             return;
@@ -128,52 +132,31 @@ public class Main {
         System.out.println("Please provide User ID:");
         UUID userId = UUID.fromString(scanner.next());
 
-        User user = userService.findUserById(userId);
-        if (user == null) throw new CarBookingException("No User found with ID: " + userId);
-
-        boolean noCarsBooked = true;
-        for (CarBooking carBooking : carBookingService.getCarBookings()) {
-            if (carBooking.getUser().equals(user) && carBooking.getBookingStatus().equals(BookingStatus.ACTIVE)) {
-                System.out.println(carBooking.getCar());
-                noCarsBooked = false;
-            }
-        }
-        if (noCarsBooked) {
+        List<Car> carsBookedByUser = carBookingService.getCarsBookedByUser(userId);
+        if (carsBookedByUser.isEmpty()) {
             System.out.println("No cars booked by the user");
+            return;
         }
+        carsBookedByUser.forEach(System.out::println);
     }
 
-    private static void displayCarBookings(CarBookingService carBookingService) {
-        if (carBookingService.noCarBookingsExist()) {
+    private static void displayCarBookings(List<CarBooking> carBookings) {
+        if (carBookings.isEmpty()) {
             System.out.println("No Car Bookings found");
             return;
         }
-        for (CarBooking carBooking : carBookingService.getCarBookings()) {
-            System.out.println(carBooking);
-        }
+        carBookings.forEach(System.out::println);
     }
 
-    private static void displayAvailableCars(CarService carService, CarBookingService carBookingService, boolean displayElectricCars) {
-        boolean noCarsAvailable = true;
-        for (Car car : carService.getCars()) {
-            if (displayElectricCars) {
-                if (car.isElectric() && !carBookingService.isCarBooked(car)) {
-                    System.out.println(car);
-                    noCarsAvailable = false;
-                }
-            } else if (!carBookingService.isCarBooked(car)) {
-                System.out.println(car);
-                noCarsAvailable = false;
-            }
-        }
-        if (noCarsAvailable) {
+    private static void displayAvailableCars(List<Car> availableCars) {
+        if (availableCars.isEmpty()) {
             System.out.println("No Cars available to book");
+            return;
         }
+        availableCars.forEach(System.out::println);
     }
 
-    private static void displayUsers(UserService userService) {
-        for (User user : userService.getUsers()) {
-            System.out.println(user);
-        }
+    private static void displayUsers(List<User> users) {
+        users.forEach(System.out::println);
     }
 }
