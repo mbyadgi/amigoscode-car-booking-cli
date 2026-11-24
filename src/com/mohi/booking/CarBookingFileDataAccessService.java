@@ -59,10 +59,13 @@ public class CarBookingFileDataAccessService implements CarBookingDao {
     @Override
     public CarBooking cancelCarBooking(UUID carBookingId) {
         List<CarBooking> carBookings = getCarBookings();
-        CarBooking cancelledBooking = carBookings.stream()
+        Optional<CarBooking> cancelledBooking = carBookings.stream()
                 .filter(carBooking -> carBookingId.equals(carBooking.getId()))
-                .findFirst().get();
-        cancelledBooking.setBookingStatus(BookingStatus.CANCELLED);
+                .findFirst();
+
+        if (cancelledBooking.isEmpty()) throw new CarBookingException("No booking found for ID: " + carBookingId);
+
+        cancelledBooking.get().setBookingStatus(BookingStatus.CANCELLED);
 
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
             outputStream.writeObject(carBookings);
@@ -70,6 +73,6 @@ public class CarBookingFileDataAccessService implements CarBookingDao {
             throw new CarBookingException("error while saving car booking: " + e.getMessage());
         }
 
-        return cancelledBooking;
+        return cancelledBooking.get();
     }
 }

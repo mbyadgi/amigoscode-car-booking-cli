@@ -67,8 +67,15 @@ public class CarBookingService {
     }
 
     public List<Car> getAvailableCars() {
+        List<UUID> bookedCarIds = carBookingDao.getCarBookings().stream()
+                .filter(carBooking -> carBooking.getBookingStatus().equals(BookingStatus.ACTIVE))
+                .map(carBooking -> carBooking.getCar().getId())
+                .toList();
+
+        if (bookedCarIds.isEmpty()) return carService.getCars();
+
         return carService.getCars().stream()
-                .filter(car -> !isCarBooked(car))
+                .filter(car -> !bookedCarIds.contains(car.getId()))
                 .toList();
     }
 
