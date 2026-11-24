@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserFileDataAccessService implements UserDao {
@@ -40,12 +41,7 @@ public class UserFileDataAccessService implements UserDao {
     }
 
     @Override
-    public User findUserById(UUID userId) {
-        for (User user : getUsers()) {
-            if (userId.equals(user.getId())) {
-                return user;
-            }
-        }
-        return null;
+    public Optional<User> findUserById(UUID userId) {
+        return getUsers().stream().filter(user -> userId.equals(user.getId())).findFirst();
     }
 }

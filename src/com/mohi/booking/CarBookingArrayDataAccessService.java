@@ -1,7 +1,10 @@
 package com.mohi.booking;
 
+import com.mohi.exception.CarBookingException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CarBookingArrayDataAccessService implements CarBookingDao {
@@ -13,13 +16,8 @@ public class CarBookingArrayDataAccessService implements CarBookingDao {
     }
 
     @Override
-    public CarBooking findCarBookingById(UUID carBookingId) {
-        for (CarBooking carBooking : carBookings) {
-            if (carBookingId.equals(carBooking.getId())) {
-                return carBooking;
-            }
-        }
-        return null;
+    public Optional<CarBooking> findCarBookingById(UUID carBookingId) {
+        return carBookings.stream().filter(carBooking -> carBookingId.equals(carBooking.getId())).findFirst();
     }
 
     @Override
@@ -30,8 +28,9 @@ public class CarBookingArrayDataAccessService implements CarBookingDao {
 
     @Override
     public CarBooking cancelCarBooking(UUID carBookingId) {
-        CarBooking carBooking = findCarBookingById(carBookingId);
-        carBooking.setBookingStatus(BookingStatus.CANCELLED);
-        return carBooking;
+        Optional<CarBooking> carBooking = findCarBookingById(carBookingId);
+        if (carBooking.isEmpty()) throw new CarBookingException("No booking found for ID: " + carBookingId);
+        carBooking.get().setBookingStatus(BookingStatus.CANCELLED);
+        return carBooking.get();
     }
 }

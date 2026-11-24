@@ -2,6 +2,7 @@ package com.mohi.car;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CarArrayDataAccessService implements CarDao {
@@ -28,12 +29,7 @@ public class CarArrayDataAccessService implements CarDao {
     }
 
     @Override
-    public Car findCarById(UUID carId) {
-        for (Car car : cars) {
-            if (carId.equals(car.getId())) {
-                return car;
-            }
-        }
-        return null;
+    public Optional<Car> findCarById(UUID carId) {
+        return cars.stream().filter(car -> carId.equals(car.getId())).findFirst();
     }
 }
